@@ -1,94 +1,75 @@
 
-WIDTH = 400;
-HEIGHT = 400;
+WIDTH = 1200;
+HEIGHT = 480;
 
-function preload(){
-	stand = loadImage("res/Stand.png");
-}
+VIEWWIDTH = 600;
+VIEWHEIGHT = 480;
+
+XTILES = 100;
+YTILES = 30;
+
+TILEWIDTH = 12;
+TILEHEIGHT = 16;
+
+var keyW = false;
+var keyA = false;
+var keyS = false;
+var keyD = false;
+var keyG = false;
+
+var offsetX = 0;
+var offsetY = 0;
 
 function setup(){
-	createCanvas(WIDTH, HEIGHT);
-	background(0, 0, 0);
-	init();
-}
-
-function init(){
-	bullets = [];
-	ebullets = [];
-	enemies = [];
-	spawns = [];
-	player.x = WIDTH / 2;
-	player.y = HEIGHT / 2;
-	pause = false;
-	gameIsOver = false;
+	createCanvas(VIEWWIDTH, VIEWHEIGHT);
+	frameRate(60);
 }
 
 function draw(){
-	noStroke()
-	background(71);
-	gameArea();
+	noStroke();
+	offsetX = VIEWWIDTH / 2 - player.x;
+	push();
+	translate(offsetX, offsetY);
+	rect(-offsetX, -offsetY, 600, 480);
+	drawMap();
+	pop();
+	player.update();
 }
 
-function gameArea(){
-	if(!pause){
-		player.update();
-		updateOthers();
-		if(gameIsOver){
-			gameOver();
+
+function drawMap(){
+	for(var i = 0; i < XTILES; i++){
+		for(var j = 0; j < YTILES; j++){
+			tile = cell(i, j);
+			if(tile == 1){
+				fill(255, 0, 0);
+				rect(i * TILEWIDTH, j * TILEHEIGHT, TILEWIDTH, TILEHEIGHT);
+			} else if(tile == 2){
+				fill(255);
+				rect(i * TILEWIDTH, j * TILEHEIGHT, TILEWIDTH, TILEHEIGHT);
+			}
 		}
 	}
 }
 
-function Bullet(x, y){
-	this.x = x;
-	this.y = y;
-	this.s = 4;
-	this.popping = false;
-
-	this.draw = function(){
-		fill(211, 211, 71);
-		rect(this.x, this.y, this.s, this.s);
-	}
-
-	this.move = function(){
-		this.y -= 5;
-	}
-
-	this.poof = function(){
-		this.popping = true;
-	}
+function grid(a, w){
+	return a * w;
 }
 
-function EnemyBullet(x, y, vx, vy){
-	this.x = x;
-	this.y = y;
-	this.vx = vx;
-	this.vy = vy;
-	this.s = 4;
-	this.popping = false;
-
-	this.draw = function(){
-		fill(211, 71, 211);
-		rect(this.x, this.y, this.s, this.s);
-	}
-
-	this.move = function(){
-		this.x += vx;
-		this.y += vy; 
-	}
-
-	this.poof = function(){
-		this.popping = true;
-	}
+function snap(a, w){
+	return floor(a/w);
 }
 
-function keyReleased() {
-	if(keyCode == 80){
-		if(pause){
-			pause = false;
-		} else {
-			pause = true;
-		}
+function cell(x, y){
+	return tiles[x + (y * XTILES)]
+}
+
+function ccell(x, y){
+	tile = cell(x, y);
+	if(tile == 1){
+		return true;
+	} else {
+		return false;
 	}
 }
 
@@ -100,78 +81,38 @@ function collide(x1, y1, w1, h1, x2, y2, w2, h2){
 	}
 }
 
-function outside(x, y, w, h){
-	if(x > WIDTH || x + w < 0 || y > HEIGHT || y + h < 0){
-		return true;
-	} else {
-		return false;
+
+function keyPressed(){
+	switch(keyCode){
+		case 87:
+		keyW = true;
+		break;
+		case 83:
+		keyS = true;
+		break;
+		case 65:
+		keyA = true;
+		break;
+		case 68:
+		keyD = true;
+		break;
 	}
 }
 
-function gameOver(){
-	bullets.length = 0;
-	ebullets.length = 0;
-	init();
+
+function keyReleased(){
+	switch(keyCode){
+		case 87:
+		keyW = false;
+		break;
+		case 83:
+		keyS = false;
+		break;
+		case 65:
+		keyA = false;
+		break;
+		case 68:
+		keyD = false;
+		break;
+	}
 }
-
-function updateOthers(){
-		for(var i = 0; i < enemies.length; i++){
-			enemies[i].update();
-			if(collide(enemies[i].x, enemies[i].y, enemies[i].w, enemies[i].h, player.x, player.y, player.w, player.h)){
-				gameIsOver = true;
-			}
-			if(outside(enemies[i].x, enemies[i].y, enemies[i].w, enemies[i].h)){
-				enemies.splice(i, 1);
-			}
-		}
-		// BULLET COLLISION
-		for(var i = 0; i < ebullets.length; i++){
-			ebullets[i].draw();
-			ebullets[i].move();
-			if(collide(ebullets[i].x, ebullets[i].y, ebullets[i].s, player.x, player.y, player.s)){
-				ebullets[i].poof();
-			}
-			if(outside(ebullets[i].x, ebullets[i].y, ebullets[i].s)){
-				ebullets[i].poof();
-			}
-			if(ebullets[i].popping){
-				ebullets.splice(i, 1);
-			}
-		}
-		for(var i = 0; i < bullets.length; i++){
-			bullets[i].draw();
-			bullets[i].move();
-			for(var j = 0; j < enemies.length; j++) {
-				if(collide(bullets[i].x, bullets[i].y, bullets[i].s, enemies[j].x, enemies[j].y, enemies[j].s)){
-					bullets[i].poof();
-					enemies[j].hp -= 1;
-					if(enemies[j].hp <= 0){
-						enemies.splice(j, 1);
-					}
-				}
-			}
-			if(outside(bullets[i].x, bullets[i].y, bullets[i].s)){
-				bullets[i].poof();
-			}
-			if(bullets[i].popping){
-				bullets.splice(i, 1);
-			}
-		}
-}
-
-Array.min = function(array){
-	return Math.min.apply(Math, array);
-};
-
-// fire tracking
-/*
-		if(frog.firecd < 0){
-			var ax = player.x + 10;
-			var ay = player.y + 10;
-			var a = atan2(ay - frog.y, ax - frog.x);
-			var eBullet = new EnemyBullet(frog.x + frog.center, frog.y + frog.center, cos(a), sin(a));
-			ebullets.push(eBullet);
-			frog.firecd = frog.cfirecd;
-		}
-		frog.firecd -= 1;
-*/
