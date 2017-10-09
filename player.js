@@ -1,86 +1,78 @@
+
 player = {
-	x:576,
-	y:16,
+	x:0,
+	y:0,
 	vx:0,
 	vy:0,
-	vvy:0,
-	falling:false,
-	jumping:false,
-
-	update:function(){
-		player.draw();
-		player.move();
-	},
+	w:12,
+	h:16,
+	bs:4,
+	firecd:0,
+	heat:0,
+	heats:[],
 
 	draw:function(){
-		fill(255, 0, 0);
-		rect(VIEWWIDTH / 2, player.y, TILEWIDTH, TILEHEIGHT);
+		if(player.spr){
+			image(player.spr, player.x, player.y);
+		} else {
+
+		}
+	},
+
+	update:function(){
+		player.fire();
+		player.move();
+		player.draw();
+	},
+
+	fire:function(){
+		for(var i = 0; i < enemies.length; i++){
+			player.d = dist(player.x, player.y, enemies[i].x, enemies[i].y);
+			player.heats.push(player.d);
+		}
+		player.heat = Math.min(60, Array.min(player.heats) / 8)
+		player.heats.length = 0;
+		if(player.firecd < 0){
+			var bullet = new Bullet(player.x + player.w / 2 - player.bs / 2, player.y);
+			bullets.push(bullet);
+			player.firecd = player.heat;
+		}
+		player.firecd -= 1;
 	},
 
 	move:function(){
-		player.vx = 0;
-		player.vvy += 0.6;
-		if(keyA){
-			player.vx = -4;
+		if(keyW && keyA){
+			player.y += -1.6;
+			player.x += -1.6;
+			player.spr = LeftWalkUp;
+		} else if(keyW && keyD){
+			player.y += -1.6;
+			player.x += 1.6;
+			player.spr = RightWalkUp;
+		} else if(keyS && keyA){
+			player.y += 1.6;
+			player.x += -1.6;
+			player.spr = LeftWalkDown;
+		} else if(keyS && keyD){
+			player.y += 1.6;
+			player.x += 1.6;
+			player.spr = RightWalkDown;
+		} else if(keyW){
+			player.y += -1.6;
+			player.spr = StandUp;
+		} else if(keyS){
+			player.y += 1.6;
+			player.spr = StandDown; 
+		} else if(keyA){
+			player.x += -1.6;
+			player.spr = LeftWalk;
 		} else if(keyD){
-			player.vx = 4;
+			player.x += 1.6;
+			player.spr = RightWalk;
 		} else {
-			player.vx = 0;
+			player.spr = Stand;
 		}
-
-		if(keyW && !player.jumping && !player.falling){
-			player.vvy -= 10;
-			player.jumping = true;
-		}
-
-		player.x += player.vx;
-		player.y += player.vy;
-		player.vy = constrain(player.vvy, -16, 16);
-           
-		fx = snap(player.x, TILEWIDTH);
-		fy = snap(player.y, TILEHEIGHT);
-
-		nx = player.x % TILEWIDTH;
-		ny = player.y % TILEHEIGHT; 
-
-		centertile = ccell(fx, fy);
-		righttile = ccell(fx + 1, fy);
-		downtile = ccell(fx, fy + 1);
-		diagonaltile = ccell(fx + 1, fy + 1);
-
-		if (player.vy > 0) {
-			if ((downtile && !centertile) || (diagonaltile && !righttile && nx)) {
-				player.y = grid(fy, TILEHEIGHT);       
-				player.vy = 0;
-				player.vvy = 0;  
-				player.falling = false;
-				player.jumping = false;            
-				ny = 0; 
-			}
-		} else if (player.vy < 0) {
-			if ((centertile && !downtile ) || (righttile && !diagonaltile && nx)) {
-				player.y = grid(fy + 1, TILEHEIGHT);
-				player.vy = 0;
-				player.vvy = 0;
-				centertile = downtile;
-				righttile = diagonaltile;
-				ny = 0;
-			}
-		}
-
-		if (player.vx > 0) {
-			if ((righttile && !centertile) || (diagonaltile  && !downtile  && ny)) {
-				player.x = grid(fx, TILEWIDTH);
-				player.vx = 0;
-			}
-		} else if (player.vx < 0) {
-			if ((centertile     && !righttile) || (downtile  && !diagonaltile && ny)) {
-				player.x = grid(fx + 1, TILEWIDTH);
-				player.vx = 0;
-			}
-		}
-
-		player.falling = ! (downtile || (nx && diagonaltile));
-
-	}	
+		player.x = constrain(player.x, 0, WIDTH - player.w);
+		player.y = constrain(player.y, 0, HEIGHT - player.h);
+	}
 }
