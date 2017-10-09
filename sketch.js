@@ -8,18 +8,18 @@ var keyS = false;
 var keyD = false;
 
 function preload(){
-	Stand = loadImage("assets/Stand.png");
-	StandUp = loadImage("assets/StandUp.png");
-	StandDown = loadImage("assets/StandDown.png");
-	LeftWalk = loadImage("assets/LeftWalk.png");
-	LeftWalkUp = loadImage("assets/LeftWalkUp.png");
-	LeftWalkDown = loadImage("assets/LeftWalkDown.png");
-	RightWalk = loadImage("assets/RightWalk.png");
-	RightWalkUp = loadImage("assets/RightWalkUp.png");
-	RightWalkDown = loadImage("assets/RightWalkDown.png");
-	BulletSpr = loadImage("assets/Bullet.png");
-	LeftMiniSkull = loadImage("assets/LeftMiniSkull.png");
-	RightMiniSkull = loadImage("assets/RightMiniSkull.png");
+	Stand = loadImage("res/Stand.png");
+	StandUp = loadImage("res/StandUp.png");
+	StandDown = loadImage("res/StandDown.png");
+	LeftWalk = loadImage("res/LeftWalk.png");
+	LeftWalkUp = loadImage("res/LeftWalkUp.png");
+	LeftWalkDown = loadImage("res/LeftWalkDown.png");
+	RightWalk = loadImage("res/RightWalk.png");
+	RightWalkUp = loadImage("res/RightWalkUp.png");
+	RightWalkDown = loadImage("res/RightWalkDown.png");
+	BulletSpr = loadImage("res/Bullet.png");
+	LeftMiniSkull = loadImage("res/LeftMiniSkull.png");
+	RightMiniSkull = loadImage("res/RightMiniSkull.png");
 }
 
 function setup(){
