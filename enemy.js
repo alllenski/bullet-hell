@@ -1,42 +1,42 @@
 
-function Enemy(x, y, type){
+function Enemy(x, y){
 	this.x = x,
 	this.y = y,
-	this.s = 100,
+	this.s = 12,
+	this.center = 6,
 	this.bs = 4,
-	this.hp = 200,
+	this.hp = 5,
 	this.cfirecd = 20,
 	this.firecd = 0,
 	this.b1 = -1,
 	this.a1 = 0.1,
 	this.b2 = 1,
-
-	draw = function(){
-		fill(211);
+	
+	this.draw = function(){
+		fill(255, 0, 0);
 		rect(this.x, this.y, this.s, this.s);
 	},
 	
-	fire = function(){
+	this.fire = function(){	
 		if(this.firecd < 0){
-			var eBullet = new EnemyBullet(this.x + this.s / 2 - this.bs / 2, this.y + this.s / 2 - this.bs / 2, this.b1, 1);
+			var ax = player.x - player.s;
+			var ay = player.y - player.s;
+			var a = atan2(ay - this.y, ax - this.x);
+			var eBullet = new EnemyBullet(this.x + this.center, this.y + this.center, cos(a), sin(a));
 			ebullets.push(eBullet);
 			this.firecd = this.cfirecd;
 		}
 		this.firecd -= 1;
 	},
 
-	move = function(){
-
+	this.move = function(){
+		this.y += 1;
 	},
 
-	update = function(){
+	this.update = function(){
 		this.fire();
 		this.move();
 		this.draw();
 	}
-
-}
-
-function Minion(x, y){
 
 }

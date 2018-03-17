@@ -4,8 +4,7 @@ player = {
 	y:0,
 	vx:0,
 	vy:0,
-	w:12,
-	h:16,
+	s:4,
 	bs:4,
 	firecd:0,
 	heat:0,
@@ -15,7 +14,8 @@ player = {
 		if(player.spr){
 			image(player.spr, player.x, player.y);
 		} else {
-
+			fill(0, 255, 0);
+			rect(player.x, player.y, player.s, player.s)
 		}
 	},
 
@@ -33,7 +33,7 @@ player = {
 		player.heat = Math.min(60, Array.min(player.heats) / 8)
 		player.heats.length = 0;
 		if(player.firecd < 0){
-			var bullet = new Bullet(player.x + player.w / 2 - player.bs / 2, player.y);
+			var bullet = new Bullet(player.x + player.s / 2 - player.bs / 2, player.y);
 			bullets.push(bullet);
 			player.firecd = player.heat;
 		}
@@ -44,35 +44,27 @@ player = {
 		if(keyW && keyA){
 			player.y += -1.6;
 			player.x += -1.6;
-			player.spr = LeftWalkUp;
 		} else if(keyW && keyD){
 			player.y += -1.6;
 			player.x += 1.6;
-			player.spr = RightWalkUp;
 		} else if(keyS && keyA){
 			player.y += 1.6;
 			player.x += -1.6;
-			player.spr = LeftWalkDown;
 		} else if(keyS && keyD){
 			player.y += 1.6;
 			player.x += 1.6;
-			player.spr = RightWalkDown;
 		} else if(keyW){
 			player.y += -1.6;
-			player.spr = StandUp;
 		} else if(keyS){
 			player.y += 1.6;
-			player.spr = StandDown; 
 		} else if(keyA){
 			player.x += -1.6;
-			player.spr = LeftWalk;
 		} else if(keyD){
 			player.x += 1.6;
-			player.spr = RightWalk;
 		} else {
-			player.spr = Stand;
+
 		}
-		player.x = constrain(player.x, 0, WIDTH - player.w);
-		player.y = constrain(player.y, 0, HEIGHT - player.h);
+		player.x = constrain(player.x, 0, WIDTH - player.s);
+		player.y = constrain(player.y, 0, HEIGHT - player.s);
 	}
 }

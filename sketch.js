@@ -8,18 +8,7 @@ var keyS = false;
 var keyD = false;
 
 function preload(){
-	Stand = loadImage("res/Stand.png");
-	StandUp = loadImage("res/StandUp.png");
-	StandDown = loadImage("res/StandDown.png");
-	LeftWalk = loadImage("res/LeftWalk.png");
-	LeftWalkUp = loadImage("res/LeftWalkUp.png");
-	LeftWalkDown = loadImage("res/LeftWalkDown.png");
-	RightWalk = loadImage("res/RightWalk.png");
-	RightWalkUp = loadImage("res/RightWalkUp.png");
-	RightWalkDown = loadImage("res/RightWalkDown.png");
-	BulletSpr = loadImage("res/Bullet.png");
-	LeftMiniSkull = loadImage("res/LeftMiniSkull.png");
-	RightMiniSkull = loadImage("res/RightMiniSkull.png");
+
 }
 
 function setup(){
@@ -36,13 +25,12 @@ function init(){
 	spawnInterval = 0;
 	player.x = WIDTH / 2;
 	player.y = HEIGHT / 2;
-	player.spr = Stand;
 	pause = false;
 	gameIsOver = false;
 }
 
 function draw(){
-	noStroke()
+	noStroke();
 	background(0);
 	gameArea();
 }
@@ -71,7 +59,8 @@ function Bullet(x, y){
 	this.popping = false;
 
 	this.draw = function(){
-		image(BulletSpr, this.x, this.y);
+		fill(211, 71, 211);
+		rect(this.x, this.y, this.s, this.s);
 	}
 
 	this.move = function(){
@@ -97,8 +86,8 @@ function EnemyBullet(x, y, vx, vy){
 	}
 
 	this.move = function(){
-		this.x += vx;
-		this.y += vy; 
+		this.x += vx * 2;
+		this.y += vy * 2; 
 	}
 
 	this.poof = function(){
@@ -159,6 +148,7 @@ function outside(x, y, w, h){
 }
 
 function gameOver(){
+	console.log("the game ended");
 	enemies.length = 0;
 	bullets.length = 0;
 	ebullets.length = 0;
@@ -169,55 +159,57 @@ function spawn(){
 	var toSpawn = floor(random(4));
 	for(var i = 0; i < toSpawn; i++){
 		var x = random(380);
-		var enemy = new Enemy(x, 0, 00, 0, 1);
+		var enemy = new Enemy(x, 0);
 		enemies.push(enemy);
 	}
 }
 
 function updateOthers(){
 	for(var i = 0; i < enemies.length; i++){
-		enemies[i].update();
-		if(collide(enemies[i].x, enemies[i].y, enemies[i].w, enemies[i].h, player.x, player.y, player.w, player.h)){
+		enemies[i].update()
+		if(collide(enemies[i].x, enemies[i].y, enemies[i].s, enemies[i].s, player.x, player.y, player.s, player.s)){
 			gameIsOver = true;
 		}
-		if(outside(enemies[i].x, enemies[i].y, enemies[i].w, enemies[i].h)){
+		if(outside(enemies[i].x, enemies[i].y, enemies[i].s, enemies[i].s)){
 			enemies.splice(i, 1);
 		}
 	}
-		// BULLET COLLISION
-		for(var i = 0; i < ebullets.length; i++){
-			ebullets[i].draw();
-			ebullets[i].move();
-			if(collide(ebullets[i].x, ebullets[i].y, ebullets[i].s, player.x, player.y, player.s)){
-				ebullets[i].poof();
-			}
-			if(outside(ebullets[i].x, ebullets[i].y, ebullets[i].s)){
-				ebullets[i].poof();
-			}
-			if(ebullets[i].popping){
-				ebullets.splice(i, 1);
-			}
+	// BULLET COLLISION
+	for(var i = 0; i < ebullets.length; i++){
+		ebullets[i].draw();
+		ebullets[i].move();
+		
+		if(collide(ebullets[i].x, ebullets[i].y, ebullets[i].s, ebullets[i].s, player.x, player.y, player.s, player.s)){
+			ebullets[i].poof();
+			gameIsOver = true;
 		}
-		for(var i = 0; i < bullets.length; i++){
-			bullets[i].draw();
-			bullets[i].move();
-			for(var j = 0; j < enemies.length; j++) {
-				if(collide(bullets[i].x, bullets[i].y, bullets[i].s, enemies[j].x, enemies[j].y, enemies[j].s)){
-					bullets[i].poof();
-					enemies[j].hp -= 1;
-					if(enemies[j].hp <= 0){
-						enemies.splice(j, 1);
-					}
-				}
-			}
-			if(outside(bullets[i].x, bullets[i].y, bullets[i].s)){
-				bullets[i].poof();
-			}
-			if(bullets[i].popping){
-				bullets.splice(i, 1);
-			}
+		if(outside(ebullets[i].x, ebullets[i].y, ebullets[i].s)){
+			ebullets[i].poof();
+		}
+		if(ebullets[i].popping){
+			ebullets.splice(i, 1);
 		}
 	}
+	for(var i = 0; i < bullets.length; i++){
+		bullets[i].draw();
+		bullets[i].move();
+		for(var j = 0; j < enemies.length; j++) {
+			if(collide(bullets[i].x, bullets[i].y, bullets[i].s, bullets[i].s, enemies[j].x, enemies[j].y, enemies[j].s, enemies[j].s)){
+				bullets[i].poof();
+				enemies[j].hp -= 1;
+				if(enemies[j].hp <= 0){
+					enemies.splice(j, 1);
+				}
+			}
+		}
+		if(outside(bullets[i].x, bullets[i].y, bullets[i].s)){
+			bullets[i].poof();
+		}
+		if(bullets[i].popping){
+			bullets.splice(i, 1);
+		}
+	}
+}
 
 	Array.min = function(array){
 		return Math.min.apply(Math, array);
